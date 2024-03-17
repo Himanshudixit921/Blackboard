@@ -1,0 +1,16 @@
+.cursorDrag {
+  cursor: grab;
+}
+.cursorDragging {
+  cursor: grabbing;
+}
+.cursorDrawing {
+  cursor: crosshair;
+}
+.cursorErasing {
+  cursor: url("../../../public/images/eraser-tools-and-utensils-svgrepo-com.svg"),
+    pointer;
+}
+.cursorBrush {
+  cursor: url("../../../public/images/brush-svgrepo-com.svg"), pointer;
+}

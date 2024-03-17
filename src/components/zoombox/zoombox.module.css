@@ -1,0 +1,14 @@
+.container {
+  @apply absolute right-4 bottom-10 px-2 py-2 flex rounded-xl;
+  background-color: rgb(71, 65, 65);
+  translate: -50%;
+}
+.zoomitem {
+  @apply flex justify-center items-center text-2xl p-1 text-black mr-5 last:mr-2 cursor-pointer first:ml-2 mt-1 mb-1;
+  color: white;
+}
+.zoomitem:hover {
+  @apply text-2xl text-gray-700 rounded-full;
+  color: white;
+  background-color: rgba(107, 147, 160, 0.781);
+}

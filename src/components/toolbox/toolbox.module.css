@@ -1,0 +1,52 @@
+.container {
+  @apply absolute left-1/2 bottom-10 px-2 py-2 flex rounded-xl;
+  translate: -50%;
+  background-color: rgb(71, 65, 65);
+}
+.toolitem {
+  @apply flex justify-center items-center text-2xl p-1.5 text-black mr-5 last:mr-2 cursor-pointer first:ml-2 mt-1 mb-1;
+  color: white;
+}
+.toolitem:hover {
+  @apply text-2xl rounded-2xl;
+  color: white;
+  background-color: rgba(132, 225, 253, 0.781);
+}
+.active {
+  @apply text-3xl text-white rounded-3xl;
+  background-color: rgba(107, 147, 160, 0.781);
+  color: white;
+  transition: linear;
+  transition-duration: 100ms;
+}
+.active:hover {
+  @apply text-3xl text-white rounded-xl;
+  transition: linear;
+  transition-duration: 100ms;
+}
+
+.itemname::after {
+  @apply absolute bg-black tracking-wide text-white px-2 py-2 rounded-lg opacity-0 text-base;
+  bottom: 50px;
+  content: attr(data-info);
+  transform: translateY(5px);
+  transition: transform 600ms;
+}
+
+.itemname:hover::after {
+  transform: translateY(-70%);
+  transition-delay: 2s;
+  transition: opacity 2s ease-out, transform 1s ease;
+}
+@keyframes hideAfterOneSecond {
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.itemname:hover::after {
+  animation: hideAfterOneSecond 2s forwards;
+}
