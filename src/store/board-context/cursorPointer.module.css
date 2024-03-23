@@ -11,6 +11,3 @@
   cursor: url("../../../public/images/eraser-tools-and-utensils-svgrepo-com.svg"),
     pointer;
 }
-.cursorBrush {
-  cursor: url("../../../public/images/brush-svgrepo-com.svg"), pointer;
-}

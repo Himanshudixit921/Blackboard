@@ -5,7 +5,6 @@ import boardContext from "../../store/board-context/boardcontext";
 import { TOOL_ACTION_TYPE, TOOL_ITEMS } from "../../utils/constants";
 import sideBarContext from "../../store/sidebar-context/sidebarcontext";
 function Board() {
-  // const
   const {
     elements,
     handleOnMouseMove,
@@ -16,9 +15,11 @@ function Board() {
     setSize,
     canvasHeight,
     canvasWidth,
+    textAreaBlurHandler,
   } = useContext(boardContext);
   const { sideBarState } = useContext(sideBarContext);
   const canvasRef = useRef();
+  const typeAreaRef = useRef();
   useEffect(() => {
     const canvas = canvasRef.current;
     const sendsize = () => {
@@ -53,6 +54,14 @@ function Board() {
               context.fill(item.path);
               context.restore();
               break;
+            case TOOL_ITEMS.TEXT:
+              context.textBaseline = "top";
+              context.font = `${item.size}px Caveat`;
+              context.fillStyle = item.stroke;
+              context.fillText(item.text, item.x1, item.y1);
+              context.restore();
+              break;
+
             default:
               throw new Error("Type undefined");
           }
@@ -78,6 +87,13 @@ function Board() {
               context.fill(item.path);
               context.restore();
               break;
+            case TOOL_ITEMS.TEXT:
+              context.textBaseline = "top";
+              context.font = `${item.size}px Caveat`;
+              context.fillStyle = item.stroke;
+              context.fillText(item.text, item.x1, item.y1);
+              context.restore();
+              break;
             default:
               throw new Error("Type undefined");
           }
@@ -95,6 +111,14 @@ function Board() {
       context.clearRect(0, 0, canvas.width, canvas.height);
     };
   }, [canvasRef, elements]);
+  useEffect(() => {
+    const typeArea = typeAreaRef.current;
+    if (toolActionType === TOOL_ACTION_TYPE.TYPING) {
+      setTimeout(() => {
+        typeArea.focus();
+      }, 0);
+    }
+  }, [toolActionType]);
   const boardMouseDown = (event) => {
     handleOnMouseDown(event, sideBarState);
   };
@@ -118,14 +142,32 @@ function Board() {
     handleOnMouseUp();
   };
   return (
-    <canvas
-      className={classes.container}
-      ref={canvasRef}
-      id="canvas"
-      onMouseDown={boardMouseDown}
-      onMouseMove={boardMouseMove}
-      onMouseUp={boardMouseUp}
-    />
+    <>
+      {toolActionType === TOOL_ACTION_TYPE.TYPING && (
+        <textarea
+          type="text"
+          ref={typeAreaRef}
+          className={classes.textElementBox}
+          style={{
+            top: elements[elements.length - 1].y1,
+            left: elements[elements.length - 1].x1,
+            fontSize: `${elements[elements.length - 1]?.size}px`,
+            color: elements[elements.length - 1]?.stroke,
+          }}
+          onBlur={(event) =>
+            textAreaBlurHandler(event.target.value, sideBarState)
+          }
+        />
+      )}
+      <canvas
+        className={classes.container}
+        ref={canvasRef}
+        id="canvas"
+        onMouseDown={boardMouseDown}
+        onMouseMove={boardMouseMove}
+        onMouseUp={boardMouseUp}
+      />
+    </>
   );
 }
 

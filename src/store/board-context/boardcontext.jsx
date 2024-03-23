@@ -17,5 +17,6 @@ const boardContext = createContext({
   setSize: () => {},
   canvasWidth: 0,
   canvasHeight: 0,
+  textAreaBlurHandler: () => {},
 });
 export default boardContext;

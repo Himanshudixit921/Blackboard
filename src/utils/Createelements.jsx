@@ -9,7 +9,7 @@ export const createDrawableElement = (
   y1,
   x2,
   y2,
-  { type, stroke, fill, size }
+  { type, stroke, fill, size, text }
 ) => {
   const element = {
     id,
@@ -75,6 +75,12 @@ export const createDrawableElement = (
         [x4, y4],
       ];
       element.roughEle = gen.linearPath(points, options);
+      return element;
+    }
+    case TOOL_ITEMS.TEXT: {
+      console.log(text);
+      if (text === undefined) element.text = "";
+      else element.text = text;
       return element;
     }
     default: {

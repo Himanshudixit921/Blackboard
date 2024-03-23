@@ -64,6 +64,10 @@ const initialSideBarState = {
     size: 1,
     fill: null,
   },
+  [TOOL_ITEMS.TEXT]: {
+    size: 35,
+    stroke: COLORS.WHITE,
+  },
 };
 const Sidebarprovider = ({ children }) => {
   const [sideBarState, dispatchSideBarState] = useReducer(

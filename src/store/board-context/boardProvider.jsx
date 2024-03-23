@@ -13,6 +13,7 @@ import {
   scaledElementsOfBrush,
   scaledDownElementsOfBrush,
   closeToPoint,
+  scaledElementsofText,
 } from "../../utils/MathLogic";
 import getStroke from "perfect-freehand";
 function boardStateReducer(state, action) {
@@ -64,7 +65,10 @@ function boardStateReducer(state, action) {
       const prevElement = state.elements;
       return {
         ...state,
-        toolActionType: TOOL_ACTION_TYPE.DRAWING,
+        toolActionType:
+          state.activeItem === TOOL_ITEMS.TEXT
+            ? TOOL_ACTION_TYPE.TYPING
+            : TOOL_ACTION_TYPE.DRAWING,
         elements: [...prevElement, elementChange],
       };
     }
@@ -96,6 +100,7 @@ function boardStateReducer(state, action) {
                 stroke: item.stroke,
                 fill: item.fill,
                 size: item.size,
+                text: item.text,
               }
             );
             return dup;
@@ -161,6 +166,9 @@ function boardStateReducer(state, action) {
     }
     case "handleZoomInButton": {
       const duplicateElement = state.elements.map((item, idx) => {
+        if (!item) {
+          return "H";
+        }
         if (item.type === TOOL_ITEMS.BRUSH) {
           const newPoints = scaledElementsOfBrush(
             item.points,
@@ -174,6 +182,23 @@ function boardStateReducer(state, action) {
             stroke: item.stroke,
             path: new Path2D(getSvgPathFromStroke(getStroke(newPoints))),
           };
+          return dup;
+        } else if (item.type === TOOL_ITEMS.TEXT) {
+          const { x1, y1, size } = scaledElementsofText(
+            item.x1,
+            item.y1,
+            item.size,
+            1.1,
+            state.canvasHeight,
+            state.canvasWidth
+          );
+          const dup = createDrawableElement(idx, x1, y1, item.x2, item.y2, {
+            type: item.type,
+            stroke: item.stroke,
+            fill: item.fill,
+            size: size,
+            text: item.text,
+          });
           return dup;
         } else {
           const { x1, y1, x2, y2 } = scaledElements(
@@ -216,6 +241,23 @@ function boardStateReducer(state, action) {
             path: new Path2D(getSvgPathFromStroke(getStroke(newPoints))),
           };
           return dup;
+        } else if (item.type === TOOL_ITEMS.TEXT) {
+          const { x1, y1, size } = scaledElementsofText(
+            item.x1,
+            item.y1,
+            item.size,
+            0.9,
+            state.canvasHeight,
+            state.canvasWidth
+          );
+          const dup = createDrawableElement(idx, x1, y1, item.x2, item.y2, {
+            type: item.type,
+            stroke: item.stroke,
+            fill: item.fill,
+            size: size,
+            text: item.text,
+          });
+          return dup;
         } else {
           const { x1, y1, x2, y2 } = scaledDownElements(
             item.x1,
@@ -253,6 +295,16 @@ function boardStateReducer(state, action) {
         elements: duplicateElement,
       };
     }
+    case "changeText": {
+      const index = state.elements.length - 1;
+      const newElements = [...state.elements];
+      newElements[index].text = action.payload.text;
+      return {
+        ...state,
+        toolActionType: TOOL_ACTION_TYPE.NONE,
+        elements: newElements,
+      };
+    }
     default: {
       console.log("Default");
       break;
@@ -276,6 +328,9 @@ const BoardProvider = ({ children }) => {
     initialBoardState
   );
   const handleOnMouseDown = (event, sideBarState) => {
+    if (TOOL_ACTION_TYPE.TYPING === boardState.toolActionType) {
+      return;
+    }
     dispatchBoardState({
       type: "handleMouseDown",
       payload: {
@@ -296,6 +351,9 @@ const BoardProvider = ({ children }) => {
     });
   };
   const handleOnMouseMove = (event, deltaX, deltaY, sideBarState) => {
+    if (boardState.activeItem === TOOL_ITEMS.TEXT) {
+      return;
+    }
     if (boardState.activeItem === TOOL_ITEMS.ERASER) {
       dispatchBoardState({
         type: "erase",
@@ -318,6 +376,9 @@ const BoardProvider = ({ children }) => {
     }
   };
   const handleOnMouseUp = () => {
+    if (boardState.toolActionType === TOOL_ACTION_TYPE.TYPING) {
+      return;
+    }
     dispatchBoardState({
       type: "handleMouseUp",
     });
@@ -341,6 +402,16 @@ const BoardProvider = ({ children }) => {
       },
     });
   };
+  const textAreaBlurHandler = (text, sideBarState) => {
+    dispatchBoardState({
+      type: "changeText",
+      payload: {
+        text,
+        stroke: sideBarState[boardState.activeItem]?.stroke,
+        size: sideBarState[boardState.activeItem]?.size,
+      },
+    });
+  };
   const boardContextProviderValue = {
     activeItem: boardState.activeItem,
     elements: boardState.elements,
@@ -355,6 +426,7 @@ const BoardProvider = ({ children }) => {
     canvasHeight: boardState.canvasHeight,
     canvasWidth: boardState.canvasWidth,
     setSize,
+    textAreaBlurHandler,
   };
   return (
     <boardContext.Provider value={boardContextProviderValue}>
@@ -374,9 +446,6 @@ const BoardProvider = ({ children }) => {
             [classes.cursorDrawing]:
               boardState.toolActionType === TOOL_ACTION_TYPE.DRAWING &&
               boardState.activeItem !== TOOL_ITEMS.BRUSH,
-          },
-          {
-            [classes.cursorBrush]: boardState.activeItem === TOOL_ITEMS.BRUSH,
           },
           {
             [classes.cursorErasing]:

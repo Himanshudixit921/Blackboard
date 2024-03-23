@@ -7,6 +7,7 @@ import { RiDragMoveFill } from "react-icons/ri";
 import { GoArrowRight } from "react-icons/go";
 import { FaPaintBrush } from "react-icons/fa";
 import { LuEraser } from "react-icons/lu";
+import { BsFonts } from "react-icons/bs";
 import cn from "classnames";
 import { TOOL_ITEMS } from "../../utils/constants";
 import boardContext from "../../store/board-context/boardcontext";
@@ -83,6 +84,16 @@ function Toolbar() {
       >
         <div className={classes.itemname} data-info={"Eraser"}>
           <LuEraser />
+        </div>
+      </div>
+      <div
+        className={cn(classes.toolitem, {
+          [classes.active]: activeItem === TOOL_ITEMS.TEXT,
+        })}
+        onClick={() => handleToolItemClick({ tool: TOOL_ITEMS.TEXT })}
+      >
+        <div className={classes.itemname} data-info={"Text"}>
+          <BsFonts />
         </div>
       </div>
     </div>

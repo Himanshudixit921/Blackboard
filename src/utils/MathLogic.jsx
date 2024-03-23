@@ -84,6 +84,23 @@ export const scaledDownElementsOfBrush = (
 
   return scaledPoints;
 };
+// export const scaledDownElementsOfText = (
+//   x,
+//   y,
+//   zoomFactor,
+//   canvasWidth,
+//   canvasHeight
+// ) => {
+//   const centerX = canvasWidth / 2;
+//   const centerY = canvasHeight / 2;
+
+//   const scaledPoints = points.map((point) => ({
+//     x: centerX + (point.x - centerX) / scaleFactor,
+//     y: centerY + (point.y - centerY) / scaleFactor,
+//   }));
+
+//   return scaledPoints;
+// };
 export const scaledDownElements = (
   startX,
   startY,
@@ -121,7 +138,28 @@ export const scaledDownElements = (
     y2: finalEndY,
   };
 };
-
+export const scaledElementsofText = (
+  x,
+  y,
+  size,
+  zoomFactor,
+  canvasHeight,
+  canvasWidth
+) => {
+  const canvasCenterX = canvasWidth / 2;
+  const canvasCenterY = canvasHeight / 2;
+  const offsetX = x - canvasCenterX;
+  const offsetY = y - canvasCenterY;
+  const newX = canvasCenterX + offsetX * zoomFactor;
+  const newY = canvasCenterY + offsetY * zoomFactor;
+  const initialFontSize = size;
+  const zoomedFontSize = initialFontSize * zoomFactor;
+  return {
+    x1: newX,
+    y1: newY,
+    size: zoomedFontSize,
+  };
+};
 export const isPointCloseToLine = (x1, y1, x2, y2, pointX, pointY, size) => {
   const distToStart = distanceBetweenPoints(x1, y1, pointX, pointY);
   const distToEnd = distanceBetweenPoints(x2, y2, pointX, pointY);

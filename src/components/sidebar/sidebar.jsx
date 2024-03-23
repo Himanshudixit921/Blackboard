@@ -63,9 +63,13 @@ const Sidebar = () => {
       )}
       {SIZE_TOOL_TYPES.includes(activeItem) && (
         <div className={classes.selectOptionContainer}>
-          <div className={classes.toolBoxLabel}>Brush Size</div>
+          <div className={classes.toolBoxLabel}>
+            {activeItem === TOOL_ITEMS.TEXT ? "Text Size" : "Brush Size"}
+          </div>
           <input
             type="range"
+            min={activeItem === TOOL_ITEMS.TEXT ? 40 : 1}
+            max={activeItem === TOOL_ITEMS.TEXT ? 100 : 10}
             step={1}
             value={size}
             onChange={(event) =>
