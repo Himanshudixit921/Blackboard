@@ -18,5 +18,9 @@ const boardContext = createContext({
   canvasWidth: 0,
   canvasHeight: 0,
   textAreaBlurHandler: () => {},
+  history: [[]],
+  index: 0,
+  handleRedo: () => {},
+  handleUndo: () => {},
 });
 export default boardContext;

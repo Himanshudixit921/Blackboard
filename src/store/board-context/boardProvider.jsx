@@ -290,19 +290,55 @@ function boardStateReducer(state, action) {
       duplicateElement = duplicateElement.filter((element) => {
         return !closeToPoint(element, clientX, clientY, size);
       });
+      console.log(duplicateElement, state.index);
+      const duplicateHistory = state.history.slice(0, state.index + 1);
+      duplicateHistory.push(duplicateElement);
       return {
         ...state,
+        index:
+          state.index + (duplicateElement.length !== state.elements.length),
         elements: duplicateElement,
+        history: duplicateHistory,
       };
     }
     case "changeText": {
       const index = state.elements.length - 1;
       const newElements = [...state.elements];
       newElements[index].text = action.payload.text;
+      const duplicateHistory = state.history.slice(0, state.index + 1);
+      duplicateHistory.push(newElements);
       return {
         ...state,
         toolActionType: TOOL_ACTION_TYPE.NONE,
         elements: newElements,
+        history: duplicateHistory,
+        index: state.index + 1,
+      };
+    }
+    case "drawUp": {
+      const duplicateElement = [...state.elements];
+      const duplicateHistory = state.history.slice(0, state.index + 1);
+      duplicateHistory.push(duplicateElement);
+      return {
+        ...state,
+        history: duplicateHistory,
+        index: state.index + 1,
+      };
+    }
+    case "undo": {
+      if (state.index <= 0) return state;
+      return {
+        ...state,
+        elements: state.history[state.index - 1],
+        index: state.index - 1,
+      };
+    }
+    case "redo": {
+      if (state.index >= state.history.length - 1) return state;
+      return {
+        ...state,
+        elements: state.history[state.index + 1],
+        index: state.index + 1,
       };
     }
     default: {
@@ -321,6 +357,8 @@ const initialBoardState = {
   },
   canvasWidth: 0,
   cavasHeight: 0,
+  index: 0,
+  history: [[]],
 };
 const BoardProvider = ({ children }) => {
   const [boardState, dispatchBoardState] = useReducer(
@@ -379,6 +417,11 @@ const BoardProvider = ({ children }) => {
     if (boardState.toolActionType === TOOL_ACTION_TYPE.TYPING) {
       return;
     }
+    if (boardState.toolActionType === TOOL_ACTION_TYPE.DRAWING) {
+      dispatchBoardState({
+        type: "drawUp",
+      });
+    }
     dispatchBoardState({
       type: "handleMouseUp",
     });
@@ -412,6 +455,12 @@ const BoardProvider = ({ children }) => {
       },
     });
   };
+  const handleUndo = () => {
+    dispatchBoardState({ type: "undo" });
+  };
+  const handleRedo = () => {
+    dispatchBoardState({ type: "redo" });
+  };
   const boardContextProviderValue = {
     activeItem: boardState.activeItem,
     elements: boardState.elements,
@@ -427,6 +476,8 @@ const BoardProvider = ({ children }) => {
     canvasWidth: boardState.canvasWidth,
     setSize,
     textAreaBlurHandler,
+    undo: handleUndo,
+    redo: handleRedo,
   };
   return (
     <boardContext.Provider value={boardContextProviderValue}>

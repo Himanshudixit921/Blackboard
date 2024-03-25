@@ -8,12 +8,14 @@ import { GoArrowRight } from "react-icons/go";
 import { FaPaintBrush } from "react-icons/fa";
 import { LuEraser } from "react-icons/lu";
 import { BsFonts } from "react-icons/bs";
+import { CgUndo, CgRedo } from "react-icons/cg";
 import cn from "classnames";
 import { TOOL_ITEMS } from "../../utils/constants";
 import boardContext from "../../store/board-context/boardcontext";
 
 function Toolbar() {
-  const { activeItem, handleToolItemClick } = useContext(boardContext);
+  const { activeItem, handleToolItemClick, undo, redo } =
+    useContext(boardContext);
   return (
     <div className={classes.container}>
       <div
@@ -94,6 +96,16 @@ function Toolbar() {
       >
         <div className={classes.itemname} data-info={"Text"}>
           <BsFonts />
+        </div>
+      </div>
+      <div className={classes.toolitem} onClick={() => undo()}>
+        <div className={classes.itemname} data-info={"Undo"}>
+          <CgUndo />
+        </div>
+      </div>
+      <div className={classes.toolitem} onClick={() => redo()}>
+        <div className={classes.itemname} data-info={"Redo"}>
+          <CgRedo />
         </div>
       </div>
     </div>
